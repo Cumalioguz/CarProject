@@ -1,18 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Core.DataAccess.EntityFramework;
+using DataAccess.Abstract;
 using Entities.concrete;
-//using Entities.concrete.Car;
+using Entities.DTOs;
+using System.Collections.Generic;
 
-namespace DataAccess.Abstract
+namespace DataAccess.concrete
 {
-    public interface ICarDal
+    public interface ICarDal : IEntityRepository<Car>
     {
-        List<Car> GetAll();
-        List<Car> GetById(int id);
-        void Ekle(Car car);
-        void Sil(Car car);
-        void Guncelle(Car car);
-
+        List<CarDetailDto> GetCarDetails();
     }
 }
