@@ -1,7 +1,12 @@
 ﻿using Business.Abstract;
+using Business.Constants;
+using Business.ValidationRules.FluentValidation;
+using Core.Aspects.Autofac.Validation;
+using Core.Untilities.Result;
 using DataAccess.concrete;
 using Entities.concrete;
 using Entities.DTOs;
+using System;
 using System.Collections.Generic;
 
 namespace Business.concrete
@@ -15,33 +20,51 @@ namespace Business.concrete
         {
             _CarDal = CarDal;
         }
-
-        public void Add(Car car)
+        [ValidationAspect(typeof(CarValidator))]
+        public IResult Add(Car car)
         {
-           
+           if (car.CarName.Length<2)
+            {
+                return new ErrorResult(Messages.CarNameInvalied);
+            }
             _CarDal.Add(car);
+            return new SuccessResult(Messages.CarAdded);
+            
         }
-        public void Update(Car car)
+        public IResult Update(Car car)
         {
+            if (car.CarName.Length < 2)
+            {
+                return new ErrorResult(Messages.CarNameInvalied);
+            }
             _CarDal.Update(car);
+            return new SuccessResult(Messages.CarUpdated);
         }
-        public List<CarDetailDto> CarDetails()
+        public IDataResult<List<CarDetailDto>> CarDetails()
         {
-            return _CarDal.GetCarDetails();
+            return new SuccessDataResult<List<CarDetailDto>>(_CarDal.GetCarDetails(),Messages.CarListed);
         }
-        public void Delete(Car car)
+        public IResult Delete(Car car)
         {
-           _CarDal.Delete(car);
+            if (car.CarName.Length < 2)
+            {
+                return new ErrorResult(Messages.CarNameInvalied);
+            }
+            _CarDal.Delete(car);
+            return new SuccessResult(Messages.CarDeleted);
         }
-        public List<Car> GetAll()
+        public IDataResult<List<Car>> GetAll()
         {
-           
-            return _CarDal.GetAll();
+            if (DateTime.Now.Hour==22)
+            {
+                return new ErrorDataResult<List<Car>>(_CarDal.GetAll(),Messages.MaintenaceTime);
+            }
+            return new SuccessDataResult<List<Car>>(_CarDal.GetAll(),Messages.CarListed);
         }
 
-        public Car GetById(int id)
+        public IDataResult<Car> GetById(int id)
         {
-            throw new System.NotImplementedException();
+            return new SuccessDataResult<Car>(_CarDal.Get(c => c.CarId == id), Messages.CarListed);
         }
     }
 }
